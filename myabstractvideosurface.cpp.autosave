@@ -1,0 +1,36 @@
+#include "myabstractvideosurface.h"
+
+MyabstractVideoSurface::MyabstractVideoSurface(QObject *parent) : QAbstractVideoSurface(parent)
+{
+    
+}
+
+//设置图像格式
+QList<QVideoFrame::PixelFormat> MyabstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const
+{
+    Q_UNUSED(handleType);
+    /*将format_rgb32格式添加到格式列表中，大部分电脑摄像头都是支持这个格式的，
+     * 如果不支持根据自己的摄像头设置*/
+    return QList<QVideoFrame::PixelFormat>() << QVideoFrame::Format_RGB32;
+}
+
+//图片处理函数，将每一帧图像转成image格式，通过信号发送到主进程，这里没有判断frame
+bool MyabstractVideoSurface::present(const QVideoFrame &frame)
+{
+    //用默认的frame去后见一个mv
+    QVideoFrame mv(frame);
+    //设置mv的缓存读取方法，查帮助文档
+    mv.map(QAbstractVideoBuffer::ReadOnly );
+    
+    //用mv去生成一个image
+    QImage image(mv.bits(),mv.width(),mv.height(),mv.bytesPerLine(),
+                 QVideoFrame::imageFormatFromPixelFormat(mv.pixelFormat()));
+    
+    //因为摄像头获取到的图片是反过来的，所以需要镜像，可以自己测试一下，不镜像的效果更好理解
+    image = image.mirrored(true);
+    emit send_image(image);
+    return true;
+}
+
+
+

@@ -1,0 +1,24 @@
+#ifndef MYABSTRACTVIDEOSURFACE_H
+#define MYABSTRACTVIDEOSURFACE_H
+
+#include <QObject>
+#include <QAbstractVideoSurface>
+#include <QList>
+#include <QImage>
+
+class MyabstractVideoSurface : public QAbstractVideoSurface
+{
+    Q_OBJECT
+public:
+    explicit MyabstractVideoSurface(QObject *parent = nullptr);
+    virtual QList<QVideoFrame::PixelFormat> supportedPixelFormats(QAbstractPlanarVideoBuffer::HandleType handleType)const;
+    
+protected:
+    virtual bool present(const QVideoFrame &frame);
+    
+signals:
+        void send_image(QImage);
+public slots:
+};
+
+#endif // MYABSTRACTVIDEOSURFACE_H
